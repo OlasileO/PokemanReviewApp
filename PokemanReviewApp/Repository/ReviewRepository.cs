@@ -26,6 +26,13 @@ namespace PokemanReviewApp.Repository
             return true;
         }
 
+        public bool DeleteReviews(List<Review> reviews)
+        {
+            _context.RemoveRange(reviews);
+            _context.SaveChanges();
+            return true;
+        }
+
         public ICollection<Review> GetAllReviewOfPokemon(int pokeid)
         {
             return _context.Reviews.Where(r => r.Pokemon.Id == pokeid).ToList();    

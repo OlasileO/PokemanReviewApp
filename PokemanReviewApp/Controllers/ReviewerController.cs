@@ -71,9 +71,9 @@ namespace PokemanReviewApp.Controllers
             if (reviewerCreate == null)
                 return BadRequest(ModelState);
             var review = _reviewerRepository.GetReviewers()
-                .Where(r => r.LastName.Trim().ToUpper() == reviewerCreate.LastName.TrimEnd().ToUpperInvariant())
+                .Where(r => r.LastName.Trim().ToUpper() == reviewerCreate.LastName.TrimEnd().ToUpper())
                 .FirstOrDefault();
-            if (review == null)
+            if (review != null)
             {
                 ModelState.AddModelError("", "Reviewer  already exist");
                 return StatusCode(422, ModelState);
@@ -84,7 +84,7 @@ namespace PokemanReviewApp.Controllers
 
             var reviewerMap = _mapper.Map<Reviewer>(reviewerCreate);
             
-            if (_reviewerRepository.CreateReviwer(reviewerMap))
+            if (!_reviewerRepository.CreateReviwer(reviewerMap))
             {
                 ModelState.AddModelError("", "Something went wrong while saving");
                 return StatusCode(500, ModelState);

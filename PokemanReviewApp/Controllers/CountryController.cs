@@ -54,5 +54,81 @@ namespace PokemanReviewApp.Controllers
                 return BadRequest(ModelState);
             return Ok(country);
         }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateCountry([FromBody] CountryDTO CountryCreate)
+        {
+            if (CountryCreate == null)
+                return BadRequest(ModelState);
+            var category = _repository.GetCountries()
+                .Where(r => r.Name.Trim().ToUpper() == CountryCreate.Name.TrimEnd().ToUpper())
+                .FirstOrDefault();
+            if (category != null)
+            {
+                ModelState.AddModelError("", "Review  already exist");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var countryMap = _mapper.Map<Country>(CountryCreate);
+
+            if (!_repository.CreateCountry(countryMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+
+            }
+            return Ok("Successfully Created");
+        }
+        [HttpPut("{countryId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateCategory(int countryId, [FromBody] CountryDTO UpdateCountry)
+        {
+            if (UpdateCountry == null)
+                return BadRequest(ModelState);
+
+            if (countryId != UpdateCountry.Id)
+                return BadRequest(ModelState);
+
+            if (!_repository.CountryExist(countryId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var countryMap = _mapper.Map<Country>(UpdateCountry);
+
+            if (!_repository.UpdateCountry(countryMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while Updating");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
+        }
+
+        [HttpDelete("{countryId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteCountry(int countryId)
+        {
+            if (!_repository.CountryExist(countryId))
+                return BadRequest(ModelState);
+
+            var countryDelete = _repository.GetCountry(countryId);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            if (!_repository.DeleteCountry(countryDelete))
+            {
+                ModelState.AddModelError("", "Something Went wrong while Delete the Review");
+
+            }
+            return NoContent();
+        }
     }
 }

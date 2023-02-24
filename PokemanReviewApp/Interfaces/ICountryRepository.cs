@@ -9,5 +9,8 @@ namespace PokemanReviewApp.Interfaces
         Country GetCountryOwner(int ownerid);
         ICollection<Owner> GetOwnerFromCountry(int countryid);
         bool CountryExist(int id);
+        bool CreateCountry(Country country);
+        bool UpdateCountry(Country country);
+        bool DeleteCountry(Country country);
     }
 }
